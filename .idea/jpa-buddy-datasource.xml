@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpbDataSourceConfig">
+    <data-sources>
+      <data-source id="f6a61a70-bdd7-4558-bd8a-c69dc70fb70b" name="Assign4v1" url="jdbc:mysql://cs3743.fulgentcorp.com/cs4743_ivq495?useSSL=false&amp;allowMultiQueries=true&amp;serverTimezone=UTC" driverClass="com.mysql.cj.jdbc.Driver" />
+    </data-sources>
+    <data-source-infos>
+      <data-source-info id="f6a61a70-bdd7-4558-bd8a-c69dc70fb70b" persistence-unit-name="Default" />
+    </data-source-infos>
+  </component>
+</project>
