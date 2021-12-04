@@ -3,6 +3,6 @@
   <component name="JpaBuddyIdeaProjectConfig" ddlActionDbType="mysql">
     <option name="defaultUnitInitialized" value="true" />
     <option name="reverseEngineeringLastDbConnectionId" value="f6a61a70-bdd7-4558-bd8a-c69dc70fb70b" />
-    <option name="reLastEntityCreationPackage" value="src/main/java/com/example/accessingdatarest" />
+    <option name="reLastEntityCreationPackage" value="src/main/java/assign4/MVC" />
   </component>
 </project>

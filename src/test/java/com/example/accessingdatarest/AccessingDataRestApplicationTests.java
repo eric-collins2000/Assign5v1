@@ -17,6 +17,7 @@
 
 package com.example.accessingdatarest;
 
+import com.example.accessingdatarest.Repo.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -83,7 +84,7 @@ public class AccessingDataRestApplicationTests {
 						status().isCreated());
 
 		mockMvc.perform(
-				get("/users/search/findByLogin?login={login}", "Baggins")).andExpect(
+				get("/users/search/findByLastName?name={login}", "Baggins")).andExpect(
 						status().isOk()).andExpect(
 								jsonPath("$._embedded.users[0].login").value(
 										"Frodo"));

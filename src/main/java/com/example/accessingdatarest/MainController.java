@@ -2,6 +2,8 @@ package com.example.accessingdatarest;
 
 
 
+import com.example.accessingdatarest.Repo.PersonRepository;
+import com.example.accessingdatarest.Repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.annotation.Commit;
@@ -37,7 +39,7 @@ public class MainController {
         // This returns a JSON or XML with the users
         return userRepository.findAll();
     }
-
+    
     @Autowired
     private PersonRepository personRepository;
     @Commit
