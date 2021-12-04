@@ -12,14 +12,14 @@ import org.springframework.lang.NonNull;
 @RepositoryRestResource(collectionResourceRel = "user", path = "user")
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
-	List<User> findByLogin(@Param("login") String login);
+	//List<User> findByLogin(@Param("login") String login);
 
-	@Override
+/*	@Override
 	Optional<User> findById(Long aLong);
 
 	@Query("select u from User u where upper(u.login) = upper(?1)")
 	List<User> findByLoginIgnoreCase(@NonNull String login);
 
 	@Query("select count(u) from User u where u.login = ?1")
-	long countByLogin(@NonNull String login);
+	long countByLogin(@NonNull String login);*/
 }
