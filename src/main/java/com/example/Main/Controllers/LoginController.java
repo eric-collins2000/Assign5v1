@@ -1,13 +1,13 @@
+/*
+
 package com.example.Main.Controllers;
 
-
+import java.time.*;
 import com.example.Main.DocRobsStuff.DocRobsHash;
 import com.example.Main.Models.Session;
+import com.example.Main.Models.User;
 import com.example.Main.Repo.SessionRepository;
 import com.example.Main.Repo.UserRepository;
-
-
-
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,24 +24,34 @@ public class LoginController {
     @Commit
     @PostMapping(path="/login")
     public @ResponseBody
-    void getUser(@RequestParam String login, @RequestParam String password) {
+    JSONObject getUser(@RequestParam String login, @RequestParam String password) {
+        User userobj = userRepository.findByLogin(login);
         JSONObject obj  = userRepository.findByLogin(login).toJSON();
         String inPassword = obj.get("password").toString();
         password = DocRobsHash.getCryptoHash(password, "SHA-256");
-        if(inPassword.matches(password)){
-            System.out.println("You win");
-            System.out.println(inPassword + " Vs " + password);
-            Session session = new Session();
-            String createdToken = password.concat(session.getTimestamp().toString());
-            session.setToken(createdToken);
-            session.setPassword(password);
-            sessionRepository.save(session);
-            return "Saved";
 
+        if(inPassword.matches(password)){
+            String inLogin = obj.get("id").toString();
+            Session session = new Session();
+            LocalDateTime time = LocalDateTime.now();
+            String createdToken = login.concat(time.toString());
+            createdToken = DocRobsHash.getCryptoHash(createdToken, "SHA-256");
+            session.setToken(createdToken);
+            session.setUser(userobj);
+            sessionRepository.save(session);
+            JSONObject authorized = new JSONObject();
+            authorized.put("code", 200);
+            authorized.put("token", createdToken);
+            System.out.println(authorized.toString());
+            return authorized;
         }
         else {
-            System.out.println("Invalid Password");
-            System.out.println(inPassword + " Vs " + password);
+            JSONObject unauthorized = new JSONObject();
+            unauthorized.put("code", 401);
+            unauthorized.put("message", "Login Required");
+            System.out.println(unauthorized.toString());
+            return unauthorized;
         }
     }
 }
+*/

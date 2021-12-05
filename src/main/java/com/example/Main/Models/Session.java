@@ -19,20 +19,8 @@ public class Session {
     @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 
-    @Convert(disableConversion = true)
-    @Column(name = "timestamp", nullable = false)
-    private Instant timestamp;
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public User getUser() {
-        return user;
+    public int getUser() {
+        return user.getId();
     }
 
     public void setUser(User user) {
@@ -51,8 +39,6 @@ public class Session {
         JSONObject json = new JSONObject();
         json.put("user_id", user);
         json.put("token", token);
-        json.put("timestamp", timestamp);
-        System.out.println("Hey I got: " + json.toString());
         return json;
     }
 }

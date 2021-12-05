@@ -50,7 +50,7 @@ public class User {
 		json.put("id", id);
 		json.put("login", login);
 		json.put("password", password);
-		System.out.println("Hey I got: " + json.toString());
+		//System.out.println("Hey I got: " + json.toString());
 		return json;
 	}
 }
