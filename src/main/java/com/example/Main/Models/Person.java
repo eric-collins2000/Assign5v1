@@ -1,5 +1,7 @@
 package com.example.Main.Models;
 
+import org.json.JSONObject;
+
 import javax.persistence.*;
 
 @Table(name = "people")
@@ -52,5 +54,12 @@ public class Person {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        json.put("firstName", firstName);
+        json.put("lastName", lastName);
+        json.put("dob", dob);
+        return json;
     }
 }
