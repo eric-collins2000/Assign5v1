@@ -9,7 +9,6 @@ import com.example.Main.Models.User;
 import com.example.Main.Repo.PersonRepository;
 import com.example.Main.Repo.SessionRepository;
 import com.example.Main.Repo.UserRepository;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Controller // This means that this class is a Controller
 public class MainController {
@@ -51,12 +54,25 @@ public class MainController {
     @Autowired
     private PersonRepository personRepository;
     @Commit
-    @PostMapping(path="/addPeople") // Map ONLY POST Requests
+    @PostMapping(path="/people") // Map ONLY POST Requests
     public @ResponseBody String addNewPerson (@RequestParam String firstName
-            , @RequestParam String lastName, @RequestParam String dob) {
+            , @RequestParam String lastName, @RequestParam String dob) throws ParseException {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+        Date date = formatter.parse(dob);
+        LocalDateTime now = LocalDateTime.now();
+        Date today = formatter.parse(now.toString());
+        if(firstName.length() < 1 || firstName.length() > 100){
+            System.out.println("First name must be 1 > and < 100");
+        }
+        if(lastName.length() < 1 || lastName.length() > 100){
+            System.out.println("Last name must be 1 > and < 100");
+        }
+        if(date.after(today)){
+            System.out.println("Lier");
+        }
         Person p = new Person();
         p.setFirstName(firstName);
         p.setLastName(lastName);
@@ -66,26 +82,30 @@ public class MainController {
     }
 
 
-    @PostMapping(path="/people")
+    @GetMapping(path="/people")
     public @ResponseBody
     String getAllPeople(@RequestParam String sessionToken) {
         // This returns a JSON or XML with the users
         //return personRepository.findAll();
         JSONObject response = new JSONObject();
-        System.out.println("Something anything");
-        String localToken = sessionRepository.findByToken(sessionToken).getToken();
-        System.out.println(" TOKEN IS! " + localToken);
+        try {
+            String localToken = sessionRepository.findByToken(sessionToken).getToken();
         if(localToken.matches(sessionToken)) {
             JSONObject obj = new JSONObject();
             obj.put("people", personRepository.findAll());
             return obj.toString();
         }
         else{
-            System.out.println("Bad");
-            JSONObject unauthorized = new JSONObject();
             response.put("code", 401);
             response.put("message", "Login Required");
             System.out.println(response.toString());
+            return response.toString();
+        }
+        }
+        catch (NullPointerException e) {
+            System.out.print("NullPointerException caught");
+            response.put("code", 401);
+            response.put("message", "Token not found");
             return response.toString();
         }
     }
