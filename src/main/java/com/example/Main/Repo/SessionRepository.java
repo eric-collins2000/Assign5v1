@@ -10,5 +10,4 @@ import org.springframework.lang.NonNull;
 public interface SessionRepository extends PagingAndSortingRepository<Session, String> {
     Session findByToken(@NonNull String token);
 
-
 }

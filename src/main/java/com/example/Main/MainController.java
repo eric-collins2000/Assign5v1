@@ -31,8 +31,9 @@ public class MainController {
     private UserRepository userRepository;
 
     @Commit
-    @PostMapping(path="/addUser") // Map ONLY POST Requests
-    public @ResponseBody String addNewUser (@RequestParam String login
+    @PostMapping(path = "/addUser") // Map ONLY POST Requests
+    public @ResponseBody
+    String addNewUser(@RequestHeader(name = "X-Authorization") String sessionToken, @RequestParam String login
             , @RequestParam String password) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
@@ -43,89 +44,174 @@ public class MainController {
         userRepository.save(n);
         return "Saved";
     }
-    @GetMapping(path="/allUsers")
-    public @ResponseBody Iterable<User> getAllUsers() {
+
+    @GetMapping(path = "/allUsers")
+    public @ResponseBody
+    Iterable<User> getAllUsers() {
         // This returns a JSON or XML with the users
         return userRepository.findAll();
     }
-    
+
     @Autowired
     private PersonRepository personRepository;
+
     @Commit
-    @PostMapping(path="/people") // Map ONLY POST Requests
-    public @ResponseBody String addNewPerson (@RequestParam String firstName
+    @PostMapping(path = "/people") // Map ONLY POST Requests
+    public @ResponseBody String insertPerson(@RequestHeader(name = "X-Authorization") String sessionToken, @RequestParam String firstName
             , @RequestParam String lastName, @RequestParam String dob) throws ParseException {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
-        Date date = formatter.parse(dob);
-        LocalDateTime now = LocalDateTime.now();
-        Date today = formatter.parse(now.toString());
-        if(firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)){
-            return "First and Last name must be 1 > and < 100" +
-                    "and DOB must be later then today";
+        JSONObject response = new JSONObject();
+        try {
+            String localToken = sessionRepository.findByToken(sessionToken).getToken();
+            if (localToken.matches(sessionToken)) {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+                Date date = formatter.parse(dob);
+                LocalDateTime now = LocalDateTime.now();
+                Date today = formatter.parse(now.toString());
+                if (firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)) {
+                    response.put("error", "First and Last name must be 1 > and < 100" +
+                            "and DOB must be later then today");
+                } else {
+                    Person p = new Person();
+                    p.setFirstName(firstName);
+                    p.setLastName(lastName);
+                    p.setDob(dob);
+                    personRepository.save(p);
+                    response.put("code", 200);
+                }
+            } else {
+                response.put("code", 401);
+            }
+        } catch (NullPointerException e) {
+            System.out.print("NullPointerException caught");
+            response.put("code", 401);
         }
-        else {
-            Person p = new Person();
-            p.setFirstName(firstName);
-            p.setLastName(lastName);
-            p.setDob(dob);
-            personRepository.save(p);
-            return "Saved Person: " + p.getId();
-        }
+        return response.toString();
     }
-    @PutMapping(path="/people") // Map ONLY POST Requests
-    public @ResponseBody String updatePerson (@RequestParam String firstName
-            , @RequestParam String lastName, @RequestParam String dob) throws ParseException {
-        // @ResponseBody means the returned String is the response, not a view name
-        // @RequestParam means it is a parameter from the GET or POST request
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
-        Date date = formatter.parse(dob);
-        LocalDateTime now = LocalDateTime.now();
-        Date today = formatter.parse(now.toString());
-        if(firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)){
-            return "First and Last name must be 1 > and < 100" +
-                    "and DOB must be later then today";
+    @RequestMapping(value="/people/{id}", method = RequestMethod.PUT) // Map ONLY POST Requests
+    public @ResponseBody String updatePerson(@RequestHeader(name = "X-Authorization") String sessionToken,
+        @PathVariable String id, @RequestParam String firstName, @RequestParam String lastName, @RequestParam String dob) throws ParseException {
+        JSONObject response = new JSONObject();
+        int checkId = Integer.parseInt(id);
+        try {
+            String localToken = sessionRepository.findByToken(sessionToken).getToken();
+            if (localToken.matches(sessionToken)) {
+                if (personRepository.existsById(checkId)) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+                    Date date = formatter.parse(dob);
+                    LocalDateTime now = LocalDateTime.now();
+                    Date today = formatter.parse(now.toString());
+                    if (firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)) {
+                        response.put("code", 400);
+                        response.put("error", "First and Last name must be 1 > and < 100" +
+                                "and DOB must be later then today");
+                    } else {
+                        Person p = personRepository.findByIdEquals(checkId);
+                        p.setFirstName(firstName);
+                        p.setLastName(lastName);
+                        p.setDob(dob);
+                        personRepository.save(p);
+                        response.put("code", 200);
+                    }
+                } else {
+                    response.put("code", 401);
+                }
+            } else {
+                //Could not find ID
+                System.out.println("Id not found");
+            }
         }
-        else {
-            Person p = new Person();
-            p.setFirstName(firstName);
-            p.setLastName(lastName);
-            p.setDob(dob);
-            personRepository.save(p);
-            return "Saved Person: " + p.getId();
-        }
+                catch (NullPointerException e) {
+                    System.out.println("Null Token was: " + sessionToken);
+                    System.out.print("NullPointerException caught on updatePerson \n");
+                    response.put("code", 401);
+
+            }
+        return response.toString();
     }
+    @RequestMapping(value="/people/{id}", method = RequestMethod.DELETE) // Map ONLY POST Requests
+    public @ResponseBody String deletePerson(@RequestHeader(name = "X-Authorization") String sessionToken,
+    @PathVariable String id) {
+        JSONObject response = new JSONObject();
+        System.out.println("Attempting delete");
+        int checkId = Integer.parseInt(id);
+        try {
+            String localToken = sessionRepository.findByToken(sessionToken).getToken();
+            if (localToken.matches(sessionToken)) {
+                Person p = personRepository.findByIdEquals(checkId);
+                personRepository.delete(p);
+                response.put("code", 200);
+                    }
+            else {
+                //Could not find ID
+                response.put("code", 404);
+            }
+        }
+        catch (NullPointerException e) {
+            System.out.println("Null Token was: " + sessionToken);
+            System.out.print("NullPointerException caught on updatePerson \n");
+            response.put("code", 401);
+
+        }
+        return response.toString();
+    }
+    @RequestMapping(value="/people/{id}", method = RequestMethod.GET) // Map ONLY POST Requests
+    public @ResponseBody String fetchPerson(@RequestHeader(name = "X-Authorization") String sessionToken,
+    @PathVariable String id) {
+        JSONObject response = new JSONObject();
+        System.out.println("Attempting delete");
+        int checkId = Integer.parseInt(id);
+        try {
+            String localToken = sessionRepository.findByToken(sessionToken).getToken();
+            if (localToken.matches(sessionToken)) {
+                Person p = personRepository.findByIdEquals(checkId);
+                response.put("dob", p.getDob());
+                response.put("firstName", p.getFirstName());
+                response.put("lastName", p.getLastName());
+                response.put("code", 200);
+            }
+            else {
+                //Could not find ID
+                response.put("code", 404);
+            }
+        }
+        catch (NullPointerException e) {
+            System.out.println("Null Token was: " + sessionToken);
+            System.out.print("NullPointerException caught on updatePerson \n");
+            response.put("code", 401);
+
+        }
+        return response.toString();
+    }
+
 
 
     @GetMapping(path="/people")
     //@RequestMapping(value="/people", method={RequestMethod.GET, RequestMethod.POST})
     //@RequestMapping(value="/people", method={RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody
-    String getAllPeople (@RequestHeader(name = "X-Authorization") String sessionToken)  {
+    String fetchPeople (@RequestHeader(name = "X-Authorization") String sessionToken)  {
         // This returns a JSON or XML with the users
-        //return personRepository.findAll();
         JSONObject response = new JSONObject();
         try {
             String localToken = sessionRepository.findByToken(sessionToken).getToken();
+            System.out.println("Fetch token is: " + localToken);
         if(localToken.matches(sessionToken)) {
-            JSONObject obj = new JSONObject();
-            obj.put("people", personRepository.findAll());
-            return obj.toString();
+            response.put("people", personRepository.findAll());
+            response.put("code", 200);
+            return response.toString();
         }
         else{
             response.put("code", 401);
-            response.put("message", "Login Required");
-            System.out.println(response.toString());
             return response.toString();
         }
         }
         catch (NullPointerException e) {
-            System.out.print("NullPointerException caught");
+            System.out.print("NullPointerException caught fetch");
             response.put("code", 401);
-            response.put("message", "Token not found");
             return response.toString();
         }
     }
@@ -138,8 +224,8 @@ public class MainController {
     @PostMapping(path="/login")
     public @ResponseBody
     String getUser(@RequestParam String login, @RequestParam String password) {
-        User userobj = userRepositoryL.findByLogin(login);
-        JSONObject obj  = userRepositoryL.findByLogin(login).toJSON();
+        User userobj = userRepository.findByLogin(login);
+        JSONObject obj  = userRepository.findByLogin(login).toJSON();
         String inPassword = obj.get("password").toString();
         password = DocRobsHash.getCryptoHash(password, "SHA-256");
 
