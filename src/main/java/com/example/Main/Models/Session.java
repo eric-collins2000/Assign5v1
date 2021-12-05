@@ -1,7 +1,10 @@
 package com.example.Main.Models;
 
+import com.example.Main.Models.User;
+import org.json.JSONObject;
+
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Table(name = "session", indexes = {
         @Index(name = "USER_ID", columnList = "USER_ID")
@@ -9,10 +12,6 @@ import java.time.LocalDate;
 @Entity
 public class Session {
     @Id
-    @Column(name = "id", nullable = false)
-    private Long id; // Need to verify this
-
-    @Lob
     @Column(name = "TOKEN", nullable = false)
     private String token;
 
@@ -20,23 +19,16 @@ public class Session {
     @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
+    @Convert(disableConversion = true)
+    @Column(name = "timestamp", nullable = false)
+    private Instant timestamp;
 
-    public Long getId() {
-        return id;
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
     public User getUser() {
@@ -53,5 +45,14 @@ public class Session {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        json.put("user_id", user);
+        json.put("token", token);
+        json.put("timestamp", timestamp);
+        System.out.println("Hey I got: " + json.toString());
+        return json;
     }
 }
