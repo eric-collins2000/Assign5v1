@@ -1,4 +1,4 @@
-package com.example.accessingdatarest;
+package com.example.Main.Models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class Session {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "USER_ID", nullable = false)
-    private Users users;
+    private User user;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDate updatedAt;
@@ -39,12 +39,12 @@ public class Session {
         this.updatedAt = updatedAt;
     }
 
-    public Users getUser() {
-        return users;
+    public User getUser() {
+        return user;
     }
 
-    public void setUser(Users user) {
-        this.users = user;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getToken() {

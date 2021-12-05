@@ -1,4 +1,6 @@
-package com.example.accessingdatarest;
+package com.example.Main.Models;
+
+import org.json.JSONObject;
 
 import javax.persistence.*;
 
@@ -41,5 +43,14 @@ public class User {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public JSONObject toJSON(){
+		JSONObject json = new JSONObject();
+		json.put("id", id);
+		json.put("login", login);
+		json.put("password", password);
+		System.out.println("Hey I got: " + json.toString());
+		return json;
 	}
 }

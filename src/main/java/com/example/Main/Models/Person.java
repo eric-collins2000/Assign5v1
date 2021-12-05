@@ -1,4 +1,4 @@
-package com.example.accessingdatarest;
+package com.example.Main.Models;
 
 import javax.persistence.*;
 

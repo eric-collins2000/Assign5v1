@@ -15,9 +15,9 @@
  */
 
 
-package com.example.accessingdatarest;
+package com.example.Main;
 
-import com.example.accessingdatarest.Repo.UserRepository;
+import com.example.Main.Repo.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AccessingDataRestApplicationTests {
+public class MainTests {
 
 	@Autowired
 	private MockMvc mockMvc;
