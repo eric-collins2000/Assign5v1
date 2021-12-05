@@ -9,14 +9,12 @@ import com.example.Main.Models.User;
 import com.example.Main.Repo.PersonRepository;
 import com.example.Main.Repo.SessionRepository;
 import com.example.Main.Repo.UserRepository;
+import org.hibernate.mapping.Map;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.annotation.Commit;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,27 +62,49 @@ public class MainController {
         Date date = formatter.parse(dob);
         LocalDateTime now = LocalDateTime.now();
         Date today = formatter.parse(now.toString());
-        if(firstName.length() < 1 || firstName.length() > 100){
-            System.out.println("First name must be 1 > and < 100");
+        if(firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)){
+            return "First and Last name must be 1 > and < 100" +
+                    "and DOB must be later then today";
         }
-        if(lastName.length() < 1 || lastName.length() > 100){
-            System.out.println("Last name must be 1 > and < 100");
+        else {
+            Person p = new Person();
+            p.setFirstName(firstName);
+            p.setLastName(lastName);
+            p.setDob(dob);
+            personRepository.save(p);
+            return "Saved Person: " + p.getId();
         }
-        if(date.after(today)){
-            System.out.println("Lier");
+    }
+    @PutMapping(path="/people") // Map ONLY POST Requests
+    public @ResponseBody String updatePerson (@RequestParam String firstName
+            , @RequestParam String lastName, @RequestParam String dob) throws ParseException {
+        // @ResponseBody means the returned String is the response, not a view name
+        // @RequestParam means it is a parameter from the GET or POST request
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-dd-MM");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-dd-MM");
+        Date date = formatter.parse(dob);
+        LocalDateTime now = LocalDateTime.now();
+        Date today = formatter.parse(now.toString());
+        if(firstName.length() < 1 || firstName.length() > 100 || lastName.length() < 1 || lastName.length() > 100 || date.after(today)){
+            return "First and Last name must be 1 > and < 100" +
+                    "and DOB must be later then today";
         }
-        Person p = new Person();
-        p.setFirstName(firstName);
-        p.setLastName(lastName);
-        p.setDob(dob);
-        personRepository.save(p);
-        return "Saved";
+        else {
+            Person p = new Person();
+            p.setFirstName(firstName);
+            p.setLastName(lastName);
+            p.setDob(dob);
+            personRepository.save(p);
+            return "Saved Person: " + p.getId();
+        }
     }
 
 
     @GetMapping(path="/people")
+    //@RequestMapping(value="/people", method={RequestMethod.GET, RequestMethod.POST})
+    //@RequestMapping(value="/people", method={RequestMethod.GET, RequestMethod.POST})
     public @ResponseBody
-    String getAllPeople(@RequestParam String sessionToken) {
+    String getAllPeople (@RequestHeader(name = "X-Authorization") String sessionToken)  {
         // This returns a JSON or XML with the users
         //return personRepository.findAll();
         JSONObject response = new JSONObject();
