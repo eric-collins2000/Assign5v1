@@ -76,20 +76,24 @@ public class MainController {
     public @ResponseBody String updatePerson(@RequestHeader(name = "X-Authorization") String sessionToken,
         @PathVariable String id, @RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName, @RequestParam(required = false) String dob) throws ParseException {
         JSONObject response = new JSONObject();
+        System.out.print("f  " + firstName + " l " + lastName + " dob " + dob);
         int checkId = Integer.parseInt(id);
         try {
             String localToken = sessionRepository.findByToken(sessionToken).getToken();
             if (localToken.matches(sessionToken)) {
-                if (personRepository.existsById(checkId)) {
+                System.out.println("1");
+                if (personRepository.existsById(checkId) && (firstName != null || lastName != null || dob != null)) {
+                    System.out.println("2");
                         Person p = personRepository.findByIdEquals(checkId);
                         if(firstName != null){
-                            if(firstName.length() < 1 || firstName.length() > 100) {
-                                p.setFirstName(firstName);
+                            System.out.println("NOT NULL");
+                            if(firstName.length() > 1 && firstName.length() < 100) {
                                 System.out.print("first name set");
+                                p.setFirstName(firstName);
                             }
                         }
                         if(lastName != null ){
-                            if(lastName.length() < 1 || lastName.length() > 100) {
+                            if(lastName.length() > 1 && lastName.length() < 100) {
                                 p.setLastName(lastName);
                                 System.out.print("last name set");
                             }
@@ -105,6 +109,7 @@ public class MainController {
                                 System.out.print("dob name set");
                             }
                         }
+                        System.out.println("3");
                         personRepository.save(p);
                         response.put("code", 200);
                 } else {
