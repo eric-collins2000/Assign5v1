@@ -8,10 +8,10 @@
 		<version>2.5.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>assign4</groupId>
-	<artifactId>accessing-data-rest-complete</artifactId>
+	<groupId>assign5</groupId>
+	<artifactId>assign5</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>accessing-data-rest-complete</name>
+	<name>assign5</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>1.8</java.version>
@@ -72,13 +72,39 @@
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.0.1</version>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.13</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-maven-plugin</artifactId>
+			<version>0.0.8</version>
+			<configuration>
+				<mainClass>assign.MainController</mainClass>
+			</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>17</source>
+					<target>17</target>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
