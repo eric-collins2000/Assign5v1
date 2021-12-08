@@ -27,6 +27,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.io.IOException;
 import java.net.URL;
@@ -38,6 +45,10 @@ import java.util.ResourceBundle;
 
 
 public class MainController extends Application implements Initializable{
+    private ConfigurableApplicationContext applicationContext;
+    public void init() {
+        applicationContext = new SpringApplicationBuilder(Main.class).run();
+    }
 
     static AnchorPane root;
     private static Stage primaryStage;
@@ -74,6 +85,7 @@ public class MainController extends Application implements Initializable{
     private Label userName;
     @FXML
     private static GridPane gridRootBase;
+
 
     public MainController() {
 
@@ -186,21 +198,21 @@ public static GridPane getPane(int idx) {
         switch (idx) {
             case (0) -> {
                 logger.info("Got a 0");
-                FXMLLoader fxmlLoader0 = new FXMLLoader(MainController.class.getResource("LoginScreen.fxml"));
+                FXMLLoader fxmlLoader0 = new FXMLLoader(MainController.class.getResource("/Main/LoginScreen.fxml"));
                 Scene scene0 = new Scene(fxmlLoader0.load(), 800, 380);
                 primaryStage.setScene(scene0);
                 primaryStage.show();
             }
             case (1) -> {
                 logger.info("Got a 1");
-                FXMLLoader fxmlLoader1 = new FXMLLoader(MainController.class.getResource("people_ListView.fxml"));
+                FXMLLoader fxmlLoader1 = new FXMLLoader(MainController.class.getResource("/Main/people_ListView.fxml"));
                 Scene scene1 = new Scene(fxmlLoader1.load(), 800, 600);
                 primaryStage.setScene(scene1);
 
             }
             case (2) -> {
                 logger.info("Got a 2");
-                FXMLLoader fxmlLoader2 = new FXMLLoader(MainController.class.getResource("personDetailView.fxml"));
+                FXMLLoader fxmlLoader2 = new FXMLLoader(MainController.class.getResource("/Main/personDetailView.fxml"));
                 Scene scene2 = new Scene(fxmlLoader2.load(), 800, 600);
                 primaryStage.setScene(scene2);
             }
